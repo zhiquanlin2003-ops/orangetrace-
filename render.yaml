@@ -1,0 +1,28 @@
+# Render Blueprint - 把这个文件 commit 到仓库,Render 会自动读
+# 文档: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: orangetrace
+    runtime: docker
+    plan: free                        # 免费层 (15 min 不活动会休眠)
+    region: singapore                  # 离国内最近且有免费层
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /                  # Render 定期 GET /, 200 = 健康
+    autoDeploy: true                    # git push 就触发部署
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false                     # 在 Render 面板上填, 不入库
+      - key: AUTH_SECRET                # 32 位以上随机字符串
+        sync: false
+      - key: ENCRYPTION_KEY            # 64 位 hex (openssl rand -hex 32)
+        sync: false
+      # DATABASE_URL 由 Dockerfile 默认值决定, 不用配
+    disk:
+      name: orangetrace-data
+      mountPath: /data
+      sizeGB: 1                         # 免费层最多 1GB 持久 Volume

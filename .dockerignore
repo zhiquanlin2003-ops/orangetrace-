@@ -1,0 +1,6 @@
+# Render/Railway 部署时需保留的文件
+!.env.example
+!render.yaml
+!railway.json
+!Dockerfile
+!docker-entrypoint.sh
