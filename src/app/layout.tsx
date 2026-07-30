@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-// 关键: 让页面不streaming SSR, 强制把所有 CSS link 写进静态 HTML
-// 这样浏览器拿到 HTML 时立即可见 <link> 标签, 保证样式 100% 应用
-export const dynamic = "force-static";
-
 export const metadata: Metadata = {
   title: {
     default: "橙迹 OrangeTrace · 用一张图片，寻找世界的线索",
