@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 /* ===== OrangeTrace Design System =====
    主色: 白 + 橙. 现代 / 科技 / 探索感 / 侦探报告感.
