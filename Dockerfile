@@ -12,7 +12,8 @@ WORKDIR /app
 
 # 先 copy manifests, 利用 Docker 层缓存
 COPY package.json package-lock.json* ./
-RUN npm ci --no-audit --no-fund
+# ★ 关键: 强制装 devDeps (@tailwindcss/postcss + tailwindcss), 否则 CSS 不会编译
+RUN npm ci --no-audit --no-fund --include=dev
 
 # 单独 copy 配置文件 (避免 cache 失效过频)
 COPY next.config.ts tsconfig.json ./
