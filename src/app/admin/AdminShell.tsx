@@ -14,6 +14,7 @@ import {
   Home,
   LogOut,
   Settings,
+  History,
 } from "lucide-react";
 
 const NAV = [
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/admin/tools", label: "工具与数据源", icon: Wrench },
   { href: "/admin/logs", label: "分析日志", icon: ScrollText },
   { href: "/admin/settings", label: "站点设置", icon: Settings },
+  { href: "/history", label: "历史记录", icon: History },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

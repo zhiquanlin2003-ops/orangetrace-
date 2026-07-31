@@ -182,12 +182,16 @@ export default function AnalyzePage() {
                     </div>
                   ) : (
                     <div className="relative">
-                      <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 flex items-center justify-center">
+                      <div
+                        className="relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-200 bg-white"
+                        style={{ minHeight: '320px', maxHeight: '440px' }}
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={preview ?? ""}
                           alt="预览"
-                          className="block max-h-[26rem] max-w-full w-auto h-auto object-contain"
+                          className="mx-auto block object-contain"
+                          style={{ maxWidth: '100%', maxHeight: '420px', width: 'auto', height: 'auto' }}
                         />
                         {/* 识别框装饰 */}
                         <div className="pointer-events-none absolute inset-6 rounded-lg border-2 border-orange-400/30" />
