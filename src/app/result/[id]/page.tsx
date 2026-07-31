@@ -139,15 +139,14 @@ export default function ResultPage({
             <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
               <Card className="overflow-hidden">
                 {data.thumb_path && (
-                  <div className="relative bg-zinc-900">
+                  <div className="relative bg-white">
                     <div className="scanline z-10" />
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={data.thumb_path}
                       alt={data.filename}
-                      width={1200}
-                      height={800}
-                      className="max-h-80 w-full object-contain"
-                      unoptimized
+                      className="mx-auto block w-full object-contain"
+                      style={{ maxHeight: '320px' }}
                     />
                   </div>
                 )}
@@ -197,14 +196,13 @@ export default function ResultPage({
               <Card className="overflow-hidden">
                 <div className="grid lg:grid-cols-[1.5fr_1fr]">
                   {data.thumb_path && (
-                    <div className="relative bg-zinc-900">
-                      <Image
+                    <div className="relative flex items-center justify-center bg-white">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src={data.thumb_path}
                         alt={data.filename}
-                        width={1200}
-                        height={800}
-                        className="max-h-80 w-full object-contain"
-                        unoptimized
+                        className="block object-contain"
+                        style={{ maxWidth: '100%', maxHeight: '320px' }}
                       />
                     </div>
                   )}

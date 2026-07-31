@@ -200,15 +200,14 @@ export default function AnalyzingPage({
             <>
               {/* 缩略图预览 (扫描线效果) */}
               {data?.thumb_path && (
-                <div className="relative mt-8 w-full max-w-md overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-900">
+                <div className="relative mt-8 w-full max-w-md overflow-hidden rounded-2xl border border-zinc-200 bg-white">
                   <div className="scanline z-10" />
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={data.thumb_path}
                     alt={data.filename}
-                    width={1200}
-                    height={800}
-                    className="max-h-64 w-full object-contain"
-                    unoptimized
+                    className="mx-auto block w-full object-contain"
+                    style={{ maxHeight: '256px' }}
                   />
                   <div className="pointer-events-none absolute inset-4 rounded-lg border-2 border-orange-400/40" />
                 </div>

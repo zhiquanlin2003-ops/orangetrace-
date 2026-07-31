@@ -131,12 +131,11 @@ export default function HistoryPage() {
                   <Link href={`/result/${it.id}`}>
                     <div className="relative aspect-[16/10] bg-zinc-100">
                       {it.thumb_path ? (
-                        <Image
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
                           src={it.thumb_path}
                           alt={it.filename}
-                          fill
-                          className="object-cover"
-                          unoptimized
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-zinc-300">
