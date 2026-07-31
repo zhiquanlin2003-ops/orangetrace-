@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { safeJsonParse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/auth";
 import type { AnalysisResult } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-/** GET /api/history - 最近分析列表 (只返回列表所需字段) */
+/**
+ * GET /api/history - 最近分析列表 (只返回列表所需字段)
+ * ⚠ 仅管理员可见: 历史记录可能含用户上传的图片指纹/位置信息, 不应公开
+ */
 export async function GET(_req: NextRequest) {
+  const r = await requireAdmin();
+  if (!r.ok) {
+    return NextResponse.json({ error: "需要管理员登录后查看历史" }, { status: 401 });
+  }
   const db = getDb();
   const rows = db
     .prepare(

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Brand } from "@/components/widgets/Logo";
 import { Button } from "@/components/ui/Button";
-import { History, ScanLine } from "lucide-react";
+import { ScanLine } from "lucide-react";
 
 export function Navbar() {
   return (
@@ -11,12 +11,7 @@ export function Navbar() {
           <Brand />
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
-          <Link
-            href="/history"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors"
-          >
-            <History className="h-4 w-4" /> 历史记录
-          </Link>
+          {/* 历史记录只对管理员开放, 入口从公共 Navbar 移除避免暴露 */}
           <Link href="/privacy" className="hidden sm:inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
             隐私与安全
           </Link>
@@ -44,7 +39,6 @@ export function Footer() {
         <div className="flex gap-4 text-xs text-zinc-500">
           <Link href="/" className="hover:text-orange-600">首页</Link>
           <Link href="/analyze" className="hover:text-orange-600">分析</Link>
-          <Link href="/history" className="hover:text-orange-600">历史</Link>
           <Link href="/privacy" className="hover:text-orange-600">隐私</Link>
           <Link href="/admin" className="hover:text-orange-600">管理后台</Link>
         </div>

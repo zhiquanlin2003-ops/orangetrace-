@@ -24,13 +24,41 @@ interface HistoryItem {
 
 export default function HistoryPage() {
   const [items, setItems] = useState<HistoryItem[] | null>(null);
+  const [needLogin, setNeedLogin] = useState(false);
 
   useEffect(() => {
     fetch("/api/history", { cache: "no-store" })
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (r.status === 401) {
+          setNeedLogin(true);
+          setItems([]);
+          return { items: [] };
+        }
+        return r.json();
+      })
       .then((j) => setItems(j.items ?? []))
       .catch(() => setItems([]));
   }, []);
+
+  if (needLogin) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <div className="mx-auto max-w-md px-4 py-20 text-center">
+            <h1 className="text-2xl font-bold text-zinc-900">需要管理员登录</h1>
+            <p className="mt-2 text-sm text-zinc-500">
+              历史记录含位置/图片指纹等隐私信息, 仅管理员可看.
+            </p>
+            <Link href="/admin/login?next=/history">
+              <Button className="mt-6">前往登录</Button>
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
