@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Clock,
   MapPin,
+  Brain,
 } from "lucide-react";
 
 const MAX_BYTES = 20 * 1024 * 1024; // 20MB
@@ -36,6 +37,7 @@ export default function AnalyzePage() {
   const [allowExif, setAllowExif] = useState(true);
   const [knownRegion, setKnownRegion] = useState("");
   const [detailedReasoning, setDetailedReasoning] = useState(true);
+  const [analysisMode, setAnalysisMode] = useState<"standard" | "expert">("standard");
   const [privacyAck, setPrivacyAck] = useState(false);
   const [additionalContext, setAdditionalContext] = useState("");
 
@@ -106,6 +108,7 @@ export default function AnalyzePage() {
             allow_exif: allowExif,
             known_region: knownRegion || undefined,
             detailed_reasoning: detailedReasoning,
+            analysis_mode: analysisMode,
             privacy_acknowledged: privacyAck,
             additional_context: additionalContext || undefined,
           },
@@ -282,6 +285,47 @@ export default function AnalyzePage() {
                     checked={detailedReasoning}
                     onChange={setDetailedReasoning}
                   />
+
+                  {/* 分析模式选择 */}
+                  <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3.5">
+                    <p className="mb-2.5 text-sm font-medium text-zinc-700">分析模式</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAnalysisMode("standard")}
+                        className={`rounded-lg border-2 px-3 py-2.5 text-left transition-all ${
+                          analysisMode === "standard"
+                            ? "border-orange-400 bg-orange-50"
+                            : "border-zinc-200 bg-white hover:border-zinc-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <ScanLine className="h-4 w-4 text-orange-500" />
+                          <span className="text-sm font-semibold text-zinc-900">快速分析</span>
+                        </div>
+                        <p className="mt-1 text-[11px] leading-snug text-zinc-500">
+                          仅用 GLM-5V-Turbo 一步完成, 速度快
+                        </p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAnalysisMode("expert")}
+                        className={`rounded-lg border-2 px-3 py-2.5 text-left transition-all ${
+                          analysisMode === "expert"
+                            ? "border-orange-400 bg-orange-50"
+                            : "border-zinc-200 bg-white hover:border-zinc-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Brain className="h-4 w-4 text-orange-500" />
+                          <span className="text-sm font-semibold text-zinc-900">专家分析</span>
+                        </div>
+                        <p className="mt-1 text-[11px] leading-snug text-zinc-500">
+                          5V 观察 + GLM-5.2 推理, 更深度
+                        </p>
+                      </button>
+                    </div>
+                  </div>
 
                   <div className="rounded-xl border border-orange-200 bg-orange-50/60 p-3.5">
                     <label className="flex cursor-pointer items-start gap-2.5">

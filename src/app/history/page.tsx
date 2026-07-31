@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge, ConfidenceBadge } from "@/components/ui/Badge";
 import { timeAgo } from "@/lib/utils";
-import { History as HistoryIcon, ScanLine, ArrowRight, MapPin, Loader2 } from "lucide-react";
+import { History as HistoryIcon, ScanLine, ArrowRight, MapPin, Loader2, Trash2 } from "lucide-react";
 
 interface HistoryItem {
   id: string;
@@ -25,8 +25,9 @@ interface HistoryItem {
 export default function HistoryPage() {
   const [items, setItems] = useState<HistoryItem[] | null>(null);
   const [needLogin, setNeedLogin] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
     fetch("/api/history", { cache: "no-store" })
       .then(async (r) => {
         if (r.status === 401) {
@@ -38,7 +39,26 @@ export default function HistoryPage() {
       })
       .then((j) => setItems(j.items ?? []))
       .catch(() => setItems([]));
-  }, []);
+  };
+
+  useEffect(load, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("确认删除这条分析记录? 此操作不可撤销.")) return;
+    setDeleting(id);
+    try {
+      const r = await fetch(`/api/history?id=${id}`, { method: "DELETE" });
+      if (r.ok) {
+        load();
+      } else {
+        alert("删除失败, 请检查是否以管理员登录");
+      }
+    } catch {
+      alert("网络错误");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   if (needLogin) {
     return (
@@ -107,8 +127,8 @@ export default function HistoryPage() {
           {items && items.length > 0 && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((it) => (
-                <Link href={`/result/${it.id}`} key={it.id}>
-                  <Card className="card-hover h-full overflow-hidden">
+                <Card key={it.id} className="card-hover group relative h-full overflow-hidden">
+                  <Link href={`/result/${it.id}`}>
                     <div className="relative aspect-[16/10] bg-zinc-100">
                       {it.thumb_path ? (
                         <Image
@@ -127,6 +147,24 @@ export default function HistoryPage() {
                         <StatusBadge status={it.status} />
                       </div>
                     </div>
+                  </Link>
+                  {/* 删除按钮 */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDelete(it.id);
+                    }}
+                    disabled={deleting === it.id}
+                    className="absolute right-2 top-2 z-10 rounded-lg bg-white/90 p-1.5 text-zinc-400 shadow-sm transition-all hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                    title="删除此记录"
+                  >
+                    {deleting === it.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </button>
+                  <Link href={`/result/${it.id}`}>
                     <CardContent className="p-4">
                       <p className="truncate font-medium text-zinc-800">{it.place || "未确定地点"}</p>
                       <p className="mt-0.5 truncate text-xs text-zinc-400">{it.filename}</p>
@@ -138,8 +176,8 @@ export default function HistoryPage() {
                         查看报告 <ArrowRight className="ml-1 h-3.5 w-3.5" />
                       </div>
                     </CardContent>
-                  </Card>
-                </Link>
+                  </Link>
+                </Card>
               ))}
             </div>
           )}

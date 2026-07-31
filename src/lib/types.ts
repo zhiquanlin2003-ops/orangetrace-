@@ -90,6 +90,8 @@ export interface AnalyzeOptions {
   detailed_reasoning?: boolean; // 是否输出详细推理过程
   privacy_acknowledged?: boolean; // 隐私声明已勾选
   additional_context?: string; // 用户左侧对话框提交的补充线索
+  /** "standard" = 仅用 vision 模型一步到位; "expert" = vision 观察 → 文本模型推理 */
+  analysis_mode?: "standard" | "expert";
 }
 
 /* ---------- 分析记录 ---------- */

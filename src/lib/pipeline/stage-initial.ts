@@ -54,18 +54,34 @@ export async function stageInitial(
   // 找纯文本推理模型 (model 名不含 v 字样)
   const textConfig = allConfigs.find((c) => !isVisionModel(c.model)) ?? visionConfig;
 
-  try {
-    // ───── 阶段 2a: vision 观察 ─────
-    const observation = await runVisionObservation(args, visionConfig, args.modelImageUrl);
+  // 分析模式: standard = 仅 vision 一步到位; expert = vision 观察 → 文本推理两阶段
+  const mode = (args.options as AnalyzeOptions).analysis_mode || "standard";
 
-    // ───── 阶段 2b: 文本推理 ─────
-    const systemPrompt = buildSystemPrompt(buildSkillContext());
-    const userPrompt = buildUserPrompt({
-      exif: args.exif,
-      analyzeOptions: args.options as AnalyzeOptions,
-    });
-    // 把 vision 观察 + 原 user prompt 拼起来给文本模型
-    const combinedUserPrompt = `
+  try {
+    let llm;
+
+    if (mode === "standard") {
+      // ───── 快速分析: 单 vision 模型一把过 ─────
+      const systemPrompt = buildSystemPrompt(buildSkillContext());
+      const userPrompt = buildUserPrompt({
+        exif: args.exif,
+        analyzeOptions: args.options as AnalyzeOptions,
+      });
+      llm = await callLlm(visionConfig, {
+        systemPrompt,
+        userText: userPrompt,
+        imageUrl: args.modelImageUrl,
+      });
+    } else {
+      // ───── 专家分析: vision 观察 → 文本推理 ─────
+      const observation = await runVisionObservation(args, visionConfig, args.modelImageUrl);
+
+      const systemPrompt = buildSystemPrompt(buildSkillContext());
+      const userPrompt = buildUserPrompt({
+        exif: args.exif,
+        analyzeOptions: args.options as AnalyzeOptions,
+      });
+      const combinedUserPrompt = `
 ${userPrompt}
 
 ═══ 视觉模型 (vision) 提供的观察 ═══
@@ -75,8 +91,7 @@ ${observation}
 请基于以上视觉观察 + 你自己的推理能力, 输出最终的地理定位分析结果。
 `.trim();
 
-    let llm;
-    if (textConfig.id === visionConfig.id) {
+      if (textConfig.id === visionConfig.id) {
       // 同一个 API 时退回原行为 (vision+推理一步到位)
       llm = await callLlm(textConfig, {
         systemPrompt,
@@ -91,6 +106,7 @@ ${observation}
         // imageUrl 不传, 文本模型专心推理
       });
     }
+    } // end expert mode
 
     const parsed = parseAnalysisResult(llm.content);
     if (parsed.error || !parsed.result) {
@@ -101,7 +117,12 @@ ${observation}
     // 把模型候选转换为带 id 的 CandidateLocation
     const candidates = deriveCandidates(result, args.options.known_region);
 
-    // 落库: 用 vision 模型名 + vision 用 token (主表语义上记 "用了哪个模型")
+    // 模型名: standard 显示一个, expert 显示两个
+    const modelLabel = mode === "standard"
+      ? visionConfig.model
+      : `${visionConfig.model} → ${textConfig.model}`;
+
+    // 落库
     const initialConfidence = Math.round(result.top_location.confidence ?? 0);
     db.prepare(
       `UPDATE analyses
@@ -112,7 +133,7 @@ ${observation}
     ).run(
       JSON.stringify(result),
       initialConfidence,
-      `${visionConfig.model} → ${textConfig.model}`, // 显示用了哪两个模型
+      modelLabel,
       textConfig.id,
       llm.usage.prompt_tokens,
       llm.usage.completion_tokens,
