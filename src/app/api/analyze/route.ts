@@ -135,8 +135,13 @@ export async function POST(req: NextRequest) {
 
   // 立即返回任务 id, 让前端 /analyzing/[id] 轮询状态。
   // 真正的模型调用在后台异步进行 (不阻塞本响应)。
-  // 注意: Next.js dev 下 hot-reload 可能中断后台任务; 生产 long-running 更稳定。
-  void (async () => {
+  //
+  // ★ 关键: 用 pending Promise + interval keepAlive 防止 Node 事件循环在
+  //   response 返回后清理 fire-and-forget async callback.
+  //   Docker 容器 / Next.js production 模式下, 裸 void async 会被 GC 吞掉
+  //   导致 stageVerify + stageSecond (POI 验证 + 二次评估) 不执行.
+
+  const pipelineTask = (async () => {
     try {
       const modelUrl = await ensureModelImage(id, modelImageUrl);
       const args: PipelineArgs = {
@@ -153,6 +158,12 @@ export async function POST(req: NextRequest) {
       if (!settings.save_original_image) safeUnlink(privPath);
     }
   })();
+
+  // 全局注册: 防止 Node 事件循环在此 HTTP response 返回后的空闲间隙中
+  // 把 fire-and-forget 的 async callback 当 unreferenced promise GC 掉.
+  // 保持一个 30s keepAlive interval 直到 pipelineTask resolve.
+  const keepAlive = setInterval(() => {}, 30000);
+  pipelineTask.finally(() => clearInterval(keepAlive));
 
   return NextResponse.json({ id, status: "running" });
 }
