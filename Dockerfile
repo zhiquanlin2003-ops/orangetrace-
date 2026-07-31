@@ -12,8 +12,9 @@ WORKDIR /app
 
 # 先 copy manifests, 利用 Docker 层缓存
 COPY package.json package-lock.json* ./
-# tailwindcss 已挪到 dependencies, npm ci --omit=dev 也能装上, 彻底绕过 devDeps 问题
-RUN npm ci --no-audit --no-fund
+# ★ 用 npm install 替代 npm ci: 容忍 lock 文件缺失或与其他环境不一致
+#    这样无论 VPS 上 lock 状态如何, 都能正确安装所有 dependencies (含 tailwindcss)
+RUN npm install --no-audit --no-fund
 
 # 单独 copy 配置文件 (避免 cache 失效过频)
 COPY next.config.ts tsconfig.json ./
