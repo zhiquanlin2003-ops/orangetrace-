@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge, ConfidenceBadge } from "@/components/ui/Badge";
 import { timeAgo } from "@/lib/utils";
 import { History as HistoryIcon, ScanLine, ArrowRight, MapPin, Loader2, Trash2 } from "lucide-react";
+import { thumbUrl } from "@/lib/thumb-url";
 
 interface HistoryItem {
   id: string;
@@ -133,7 +134,7 @@ export default function HistoryPage() {
                       {it.thumb_path ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
-                          src={it.thumb_path}
+                          src={thumbUrl(it.thumb_path)}
                           alt={it.filename}
                           className="h-full w-full object-cover"
                         />

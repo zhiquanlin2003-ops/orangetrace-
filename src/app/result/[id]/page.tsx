@@ -16,6 +16,7 @@ import { CandidateMap } from "@/components/widgets/CandidateMap";
 import { ConfidenceBadge } from "@/components/ui/Badge";
 import { formatDateTime } from "@/lib/utils";
 import type { AnalysisResult, AnalyzeOptions, ExternalTool } from "@/lib/types";
+import { thumbUrl } from "@/lib/thumb-url";
 import {
   ArrowLeft,
   Clock,
@@ -143,7 +144,7 @@ export default function ResultPage({
                     <div className="scanline z-10" />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={data.thumb_path}
+                      src={thumbUrl(data.thumb_path)}
                       alt={data.filename}
                       className="mx-auto block w-full object-contain"
                       style={{ maxHeight: '320px' }}
@@ -199,7 +200,7 @@ export default function ResultPage({
                     <div className="relative flex items-center justify-center bg-white">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={data.thumb_path}
+                        src={thumbUrl(data.thumb_path)}
                         alt={data.filename}
                         className="block object-contain"
                         style={{ maxWidth: '100%', maxHeight: '320px' }}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { MapBackdrop } from "@/components/widgets/MapBackdrop";
 import { Logo } from "@/components/widgets/Logo";
+import { thumbUrl } from "@/lib/thumb-url";
 import {
   Check,
   Loader2,
@@ -204,7 +205,7 @@ export default function AnalyzingPage({
                   <div className="scanline z-10" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={data.thumb_path}
+                    src={thumbUrl(data.thumb_path)}
                     alt={data.filename}
                     className="mx-auto block w-full object-contain"
                     style={{ maxHeight: '256px' }}
