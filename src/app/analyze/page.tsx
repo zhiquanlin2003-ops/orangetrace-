@@ -182,14 +182,12 @@ export default function AnalyzePage() {
                     </div>
                   ) : (
                     <div className="relative">
-                      <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-900">
-                        <Image
-                          src={preview}
+                      <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={preview ?? ""}
                           alt="预览"
-                          width={1200}
-                          height={800}
-                          className="max-h-[26rem] w-full object-contain"
-                          unoptimized
+                          className="block max-h-[26rem] max-w-full w-auto h-auto object-contain"
                         />
                         {/* 识别框装饰 */}
                         <div className="pointer-events-none absolute inset-6 rounded-lg border-2 border-orange-400/30" />
