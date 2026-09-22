@@ -19,12 +19,16 @@ export async function GET(
   const { path: segments } = await params;
   const filename = segments[segments.length - 1];
 
-  // 安全校验: 只允许 jpg/jpeg/png/webp/gif
-  if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(filename)) {
+  // 安全校验: 只允许 jpg/jpeg/png/webp/gif, 且文件名必须是纯文件名 (禁止路径穿越)
+  if (!/^[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp|gif)$/i.test(filename)) {
     return new NextResponse("Not found", { status: 404 });
   }
-
-  const filePath = path.join(process.cwd(), "public", "uploads", filename);
+  // 双重保险: 拼接后必须仍在 uploads 目录内
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  const filePath = path.join(uploadsDir, filename);
+  if (!filePath.startsWith(uploadsDir + path.sep)) {
+    return new NextResponse("Not found", { status: 404 });
+  }
   try {
     const buf = await readFile(filePath);
     const ext = path.extname(filename).toLowerCase();
